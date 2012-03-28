@@ -1,29 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-android:orientation="vertical"
-android:layout_width="fill_parent"
-android:layout_height="fill_parent"
->
-<TextView
-android:layout_width="fill_parent"
-android:layout_height="wrap_content"
-android:text="@string/hello"
-/>
-<EditText
-android:id="@+id/EditText01"
-android:layout_height="wrap_content"
-android:layout_width="fill_parent"
-android:inputType="text"
-/>
-<Button
-android:text="@string/btntxt"
-android:id="@+id/Button01"
-android:layout_height="wrap_content"
-android:layout_width="fill_parent"
-/>
-<TextView
-android:id="@+id/TextView01"
-android:layout_height="wrap_content"
-android:layout_width="fill_parent"
-/>
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    >
+    <TextView
+        android:id="@+id/tvServiceControl"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Sterowanie usługą działającą w tle"
+        android:textSize="18dp"
+        android:layout_gravity="center"/>
+    <Button
+        android:id="@+id/btnStartService"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="Start"
+        android:layout_gravity="center" />
+    <Button
+        android:id="@+id/btnStopService"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="Stop"
+        android:layout_gravity="center" />
 </LinearLayout>
