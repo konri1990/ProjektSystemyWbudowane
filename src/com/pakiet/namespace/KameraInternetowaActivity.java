@@ -1,36 +1,82 @@
 package com.pakiet.namespace;
 
+import java.util.Timer;
+
 import android.app.Activity;
+
 import android.os.Bundle;
-import android.text.Editable;
+
+import android.util.Log;
 import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.Window;
+
 import android.widget.Button;
-import android.widget.EditText;
+
 import android.widget.TextView;
 
-public class KameraInternetowaActivity extends Activity {
-	/** Called when the activity is first created. */
-	EditText input;
-	TextView output;
-	Button buttonClick;
+public class KameraInternetowaActivity extends Activity implements
+		OnClickListener {
+	private Timer timer = new Timer();
+	private boolean clicked = false;
+	private MyServer Serwer;
 
+	// Thread t = null;
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
+		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		setContentView(R.layout.main);
 
-		input = (EditText) findViewById(R.id.EditText01);
-		output = (TextView) findViewById(R.id.TextView01);
-		buttonClick = (Button) findViewById(R.id.Button01);
-		buttonClick.setOnClickListener(new View.OnClickListener() {
+		TextView tv = (TextView) findViewById(R.id.textView1);
+		tv.setText("Kamera Internetowa wersja 1.0\n"
+				+ MyServer.getLocalIpAddress());
 
-			public void onClick(View v) {
-				display(input.getText());
-			}
-		});
+		Button bt = (Button) findViewById(R.id.button1);
+		bt.setText("START");
+		bt.setOnClickListener(this);
 	}
 
-	protected void display(Editable text) {
-		output.setText(text);
+	/**
+	 * Zamkniecie serwera 
+	 */
+	@Override
+	public void onDestroy() {
+		super.onDestroy();
+
+		if (timer != null)
+			timer.cancel();
+
+		try {
+			if (Serwer.serversocket != null) {
+				Serwer.closeConnections();
+			} else {
+				Log.e("out", "serversocket null");
+			}
+		} catch (Exception ex) {
+			Log.e("ex", "" + ex);
+		}
+	}
+
+	/**
+	 * Obsluga zdarzenia onClick buttona
+	 */
+	@Override
+	public void onClick(View v) {
+		if (v.getId() == R.id.button1) {
+			if (!clicked) {
+				Button bt = (Button) findViewById(R.id.button1);
+				bt.setText("STOP");
+				clicked = true;
+				new Thread(Serwer = new MyServer(this)).start();
+			} else {
+				Button bt = (Button) findViewById(R.id.button1);
+				bt.setText("START");
+				clicked = false;
+				Serwer.closeConnections();
+			}
+		}
+
 	}
 }
