@@ -4,6 +4,14 @@
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     >
+    
+    
+    <TextView
+        android:id="@+id/wifiInfo"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:text="TextView" />
+    
     <TextView
         android:id="@+id/textView1"
         android:layout_width="fill_parent"
