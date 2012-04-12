@@ -2,6 +2,8 @@ package com.pakiet.namespace;
 
 import java.util.Timer;
 
+import com.pakiet2.namespace.R;
+
 import android.app.Activity;
 
 import android.os.Bundle;

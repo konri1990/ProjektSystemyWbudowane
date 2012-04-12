@@ -6,6 +6,8 @@ import com.pakiet2.namespace.R;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
+import android.graphics.Bitmap;
 
 import android.net.ConnectivityManager;
 import android.os.Bundle;
@@ -16,6 +18,7 @@ import android.view.View.OnClickListener;
 import android.view.Window;
 
 import android.widget.Button;
+import android.widget.ImageView;
 
 import android.widget.TextView;
 
@@ -24,6 +27,9 @@ public class KameraInternetowaActivity extends Activity implements
 	private Timer timer = new Timer();
 	private boolean clicked = false;
 	private MyServer Serwer;
+    private static final int CAMERA_REQUEST = 1888; 
+    private ImageView imageView;
+
 
 	// Thread t = null;
 	@Override
@@ -35,26 +41,29 @@ public class KameraInternetowaActivity extends Activity implements
 
 		TextView tv = (TextView) findViewById(R.id.textView1);
 		tv.setText("Kamera Internetowa wersja 1.0\n");
-		
-		
+
 		ConnectivityManager conman = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-		boolean wifi = conman.getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnectedOrConnecting();
+		boolean wifi = conman.getNetworkInfo(ConnectivityManager.TYPE_WIFI)
+				.isConnectedOrConnecting();
 		TextView wifi_info = (TextView) findViewById(R.id.wifiInfo);
-		if(wifi){
-			wifi_info.setText("Your WI-FI is ON\n Your IP is \n" + MyServer.getLocalIpAddress());
-		}
-		else{
+		if (wifi) {
+			wifi_info.setText("Your WI-FI is ON\n Your IP is \n"
+					+ MyServer.getLocalIpAddress());
+		} else {
 			wifi_info.setText("Your WI-FI is OFF");
 		}
-		
 
 		Button bt = (Button) findViewById(R.id.button1);
 		bt.setText("START");
 		bt.setOnClickListener(this);
+
+		Button bt2 = (Button) findViewById(R.id.button2);
+		bt2.setText("TEST APARAT");
+		bt2.setOnClickListener(this);
 	}
 
 	/**
-	 * Zamkniecie serwera 
+	 * Zamkniecie serwera
 	 */
 	@Override
 	public void onDestroy() {
@@ -92,6 +101,19 @@ public class KameraInternetowaActivity extends Activity implements
 				Serwer.closeConnections();
 			}
 		}
+		if (v.getId() == R.id.button2) {
+			Intent cameraIntent = new Intent(
+					android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+			startActivityForResult(cameraIntent, CAMERA_REQUEST);
+		}
 
 	}
+
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		if (requestCode == CAMERA_REQUEST) {
+			Bitmap photo = (Bitmap) data.getExtras().get("data");
+			imageView.setImageBitmap(photo);
+		}
+	}
+
 }
