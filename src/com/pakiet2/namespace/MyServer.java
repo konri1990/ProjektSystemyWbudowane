@@ -1,7 +1,9 @@
 package com.pakiet2.namespace;
 
 import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.InputStreamReader;
+import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
@@ -54,7 +56,13 @@ public class MyServer implements Runnable {
 				input = new BufferedReader(new InputStreamReader(
 						clientsocket.getInputStream(), "ISO-8859-2"));
 				output = clientsocket.getOutputStream();
-
+				/* Proba wyslania na serwer zdjecia (trzeba testowac z telefonem
+				FileInputStream fis = new FileInputStream("plan.pdf");
+				byte[] buffer = new byte[fis.available()];
+				fis.read(buffer);
+				ObjectOutputStream oos = new ObjectOutputStream(clientsocket.getOutputStream()) ;
+				oos.writeObject(buffer); 
+				*/
 				mHandler.post(new Runnable() {
 					@Override
 					public void run() {
