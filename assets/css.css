@@ -1,5 +1,12 @@
 
 html, body {
-	font-size:50px;
+	font-size:20px;
 	background-color:#FF0000;
 } 
+
+#obrazek{
+	width:200px;
+	height:200px;
+	background-color:green;
+	margin: 0px auto;
+}

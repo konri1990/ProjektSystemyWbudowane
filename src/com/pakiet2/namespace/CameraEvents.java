@@ -1,5 +1,7 @@
 package com.pakiet2.namespace;
 
+import com.pakiet2.namespace.R;
+
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;

@@ -1,7 +1,6 @@
 package com.pakiet2.namespace;
 
 import java.io.InputStream;
-
 import android.content.Context;
 import android.widget.Toast;
 
