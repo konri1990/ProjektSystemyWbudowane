@@ -2,6 +2,7 @@ package com.pakiet2.namespace;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
@@ -56,13 +57,7 @@ public class MyServer implements Runnable {
 				input = new BufferedReader(new InputStreamReader(
 						clientsocket.getInputStream(), "ISO-8859-2"));
 				output = clientsocket.getOutputStream();
-				/* Proba wyslania na serwer zdjecia (trzeba testowac z telefonem
-				FileInputStream fis = new FileInputStream("plan.pdf");
-				byte[] buffer = new byte[fis.available()];
-				fis.read(buffer);
-				ObjectOutputStream oos = new ObjectOutputStream(clientsocket.getOutputStream()) ;
-				oos.writeObject(buffer); 
-				*/
+
 				mHandler.post(new Runnable() {
 					@Override
 					public void run() {
@@ -71,9 +66,29 @@ public class MyServer implements Runnable {
 								+ clientsocket.getPort());
 					}
 				});
-
-				send();
-
+				
+	            String sAll			= getStringFromInput(input);
+                final String header	= sAll.split("\n")[0];
+				
+              	if (header.equals("GET /secondpage HTTP/1.1")) {
+            		String js="";
+            		
+                	send("<head>" +
+                			"<link rel=\"stylesheet\" type=\"text/css\" " +
+                			"href=\""+host+"/css.css\" />" +
+                	
+                			"<meta http-equiv=\"Content-type\" value=\"text/html; charset=ISO-8859-2\">Second page " +
+                			"<img src='"+getHost()+"/ic.png'>" +
+                			"<br><a href='/'>back</a>" +
+                			"<br><a href='/secondpage'>secondpage</a>" +
+                			"<br><a href='/takepicture'>take picture</a>" +
+                			"<div id='asd' style='clear:left'></div> "+
+                			js+"</head>");
+                	
+                	closeInputOutput();
+            	} else {
+                send();
+            	}
 				closeInputOutput();
 
 			}
@@ -84,13 +99,30 @@ public class MyServer implements Runnable {
 		Log.e("out", "end");
 	}
 
+	private void send(String s) {
+	    String header=
+	    		"HTTP/1.1 200 OK\n" +
+	    		"Connection: close\n"+
+	    		"Content-type: text/html; charset=utf-8\n"+
+	    		"Content-Length: "+s.length()+"\n" +
+	    		"\n";
+
+	    try {
+	    	output.write((header+s).getBytes());
+	    } catch (Exception ex) {
+	    	Log.e("ex send", ex+"");
+	    }
+	}
+
 	/**
 	 * Metoda wysyla komunikat do klienta
 	 */
 	void send() {
-		String s = "<head>"
+		String s = "<head>" +
+				"<link rel=\"stylesheet\" type=\"text/css\" "
+    			+ "href=\""+ this.getHost() +"/css.css\" />"
 				+ "<meta http-equiv=\"Content-type\" value=\"text/html; charset=ISO-8859-2\">Kamera Klient "
-				+ "</head><body>" + "<div>Hello Android</div> " + "</body>";
+				+ "</head><body>" + "<div>Hello Android2</div> " + "<img src='" + this.getHost() + "/ic.png' /></body>";
 		String header = "HTTP/1.1 200 OK\n" + "Connection: close\n"
 				+ "Content-type: text/html; charset=utf-8\n"
 				+ "Content-Length: " + s.length() + "\n" + "\n";
@@ -126,6 +158,19 @@ public class MyServer implements Runnable {
 		return null;
 	}
 
+	String getStringFromInput(BufferedReader input) {
+        StringBuilder sb = new StringBuilder();
+        String sTemp; 
+        try {
+			while (!(sTemp = input.readLine()).equals(""))  {
+				sb.append(sTemp+"\n");
+			}
+		} catch (IOException e) {
+			return "";
+		}
+
+        return sb.toString();
+	}
 	/**
 	 * Metoda zamyka bezpiecznie serwer
 	 */

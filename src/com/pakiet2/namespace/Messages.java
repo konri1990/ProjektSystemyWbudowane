@@ -1,5 +1,7 @@
 package com.pakiet2.namespace;
 
+import java.io.InputStream;
+
 import android.content.Context;
 import android.widget.Toast;
 
@@ -14,5 +16,13 @@ public class Messages {
 		Toast toast = Toast.makeText(mycontext, s, Toast.LENGTH_SHORT);
 		toast.show();
 	}
-
+	
+	public static InputStream openFileFromAssets(String spath, Context mycontext) {
+		try {
+			InputStream is = mycontext.getResources().getAssets().open(spath);
+			return is;
+		} catch (Exception ex) {
+			return null;
+		}
+	}
 }
