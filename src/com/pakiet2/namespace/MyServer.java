@@ -129,10 +129,13 @@ public class MyServer implements Runnable {
 						+
 
 						"<meta http-equiv=\"Content-type\" value=\"text/html; charset=ISO-8859-2\"></head>"
-						+ "<body onLoad=\"doTimer()\"> KameraIP v1 " + "<img src='" + getHost()
-						+ "/ic.png'>" 
-						+ "<img id='obrazek'  src='" + getHost()
-						+ "/klatka1.jpg'/>" + "</body>");
+						+ "<body onLoad=\"doTimer()\">" 
+						+ "<div id=\"page\">" 
+						+ "<div id=\"title\"> CAMERA IP v1.2</div>" 
+						+ "<div id=\"video\"> <img id='obrazek'  src='" + getHost()
+						+ "/klatka1.jpg'/ /></div> " 
+						+ "<div id=\"copyright\">Š Konrad Zapała, Tomasz Ziębiec </div>"
+						+ "</div></body>");
 
 				closeInputOutput();
 
