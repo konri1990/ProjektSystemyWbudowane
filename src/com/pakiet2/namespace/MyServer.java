@@ -89,51 +89,49 @@ public class MyServer implements Runnable {
 					}
 				}
 
-				send("<head>"
-						+ "<link rel=\"stylesheet\" type=\"text/css\" "
+				send("<head>" + "<link rel=\"stylesheet\" type=\"text/css\" "
 						+ "href=\""
 						+ this.getHost()
-						+ "/css.css\" />" 
-						+ "<script  type=\"text/javascript\">" 
-						+ "var t; " 
-						+ "var timer_is_on=0;" 
+						+ "/css.css\" />"
+						+ "<script  type=\"text/javascript\">"
+						+ "var t; "
+						+ "var timer_is_on=0;"
 						+ "var c=0;"
-						
-+ "function timedCount()" 
-+ "{" 
-+ "if(c%2==0){      "           
-+ "    document.getElementById('obrazek').src=\""+this.getHost() + "/klatka1.jpg\";" 
-+ " }else{                " 
-+ "       document.getElementById('obrazek').src=\""+this.getHost() + "/klatka2.jpg\";" 
-+ "   }" 
-+ "c=c+1;"
-+ "  t=setTimeout(\"timedCount()\",100);" 
-+ "}" 
-
-						
-+ "function doTimer()" 
-+ "{" 
-+ "    if (!timer_is_on)" 
-+ "    {" 
-+ "       timer_is_on=1;" 
-+ "        timedCount();" 
-+ "    }" 
-+ "}" 
-						
-+ "function stopCount()" 
-+ "{" 
-+ "    clearTimeout(t);" 
-+ "    timer_is_on=0;" 
-+ "}"
+						+ "function timedCount()"
+						+ "{"
+						+ "if(c%2==0){      "
+						+ "    document.getElementById('obrazek').src=\""
+						+ this.getHost()
+						+ "/klatka1.jpg\";"
+						+ " }else{                "
+						+ "       document.getElementById('obrazek').src=\""
+						+ this.getHost()
+						+ "/klatka2.jpg\";"
+						+ "   }"
+						+ "c=c+1;"
+						+ "  t=setTimeout(\"timedCount()\",100);"
+						+ "}"
+						+ "function doTimer()"
+						+ "{"
+						+ "    if (!timer_is_on)"
+						+ "    {"
+						+ "       timer_is_on=1;"
+						+ "        timedCount();"
+						+ "    }"
+						+ "}"
+						+ "function stopCount()"
+						+ "{"
+						+ "    clearTimeout(t);"
+						+ "    timer_is_on=0;"
+						+ "}"
 						+ "</script>"
-						+
-
-						"<meta http-equiv=\"Content-type\" value=\"text/html; charset=ISO-8859-2\"></head>"
-						+ "<body onLoad=\"doTimer()\">" 
-						+ "<div id=\"page\">" 
-						+ "<div id=\"title\"> CAMERA IP v1.2</div>" 
-						+ "<div id=\"video\"> <img id='obrazek'  src='" + getHost()
-						+ "/klatka1.jpg'/ /></div> " 
+						+ "<meta http-equiv=\"Content-type\" value=\"text/html; charset=ISO-8859-2\"></head>"
+						+ "<body onLoad=\"doTimer()\">"
+						+ "<div id=\"page\">"
+						+ "<div id=\"title\"> CAMERA IP v1.2</div>"
+						+ "<div id=\"video\"> <img id='obrazek'  src='"
+						+ getHost()
+						+ "/klatka1.jpg'/ /></div> "
 						+ "<div id=\"copyright\">© Konrad Zapa³a, Tomasz Ziêbiec </div>"
 						+ "</div></body>");
 
@@ -147,6 +145,12 @@ public class MyServer implements Runnable {
 		Log.e("out", "end");
 	}
 
+	/**
+	 * Metoda wysyla komunikat tekstowy do klienta
+	 * 
+	 * @param s
+	 *            Tekst do wyslania
+	 */
 	private void send(String s) {
 		String header = "HTTP/1.1 200 OK\n" + "Connection: close\n"
 				+ "Content-type: text/html; charset=utf-8\n"
@@ -160,28 +164,13 @@ public class MyServer implements Runnable {
 	}
 
 	/**
-	 * Metoda wysyla komunikat do klienta
+	 * Metoda wysyla obrazek do klienta, czyta bajty pliku
+	 * 
+	 * @param fis
+	 *            Strumien wejsciowy, obiekt typu InputStream
+	 * @param contenttype
+	 *            Content type czyli naglowek strony jako tekst
 	 */
-	void send() {
-		String s = "<head>"
-				+ "<link rel=\"stylesheet\" type=\"text/css\" "
-				+ "href=\""
-				+ this.getHost()
-				+ "/css.css\" />"
-				+ "<meta http-equiv=\"Content-type\" value=\"text/html; charset=ISO-8859-2\">Kamera Klient "
-				+ "</head><body>" + "<div>Hello Android2</div> " + "<img src='"
-				+ this.getHost() + "/ic.png' /></body>";
-		String header = "HTTP/1.1 200 OK\n" + "Connection: close\n"
-				+ "Content-type: text/html; charset=utf-8\n"
-				+ "Content-Length: " + s.length() + "\n" + "\n";
-
-		try {
-			output.write((header + s).getBytes());
-		} catch (Exception ex) {
-			Log.e("ex send", ex + "");
-		}
-	}
-
 	void send(InputStream fis, String contenttype) {
 		try {
 			String header = "HTTP/1.1 200 OK\n" + "Content-type: "
@@ -226,6 +215,11 @@ public class MyServer implements Runnable {
 		return null;
 	}
 
+	/**
+	 * Metoda odbiera tekst z otwartego polaczenia z klientem
+	 * @param input BufferedReader 
+	 * @return Odczytany tekst od klienta
+	 */
 	String getStringFromInput(BufferedReader input) {
 		StringBuilder sb = new StringBuilder();
 		String sTemp;
