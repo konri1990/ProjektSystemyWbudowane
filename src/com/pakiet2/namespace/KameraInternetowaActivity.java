@@ -6,7 +6,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
 import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.util.Log;
@@ -38,7 +37,8 @@ public class KameraInternetowaActivity extends Activity implements
 
 		TextView tv = (TextView) findViewById(R.id.textView1);
 		tv.setText("Kamera Internetowa wersja 1.0\n");
-
+		iv = (ImageView) findViewById(R.id.imageView1);
+		
 		ConnectivityManager conman = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
 		boolean wifi = conman.getNetworkInfo(ConnectivityManager.TYPE_WIFI)
 				.isConnectedOrConnecting();
@@ -107,38 +107,11 @@ public class KameraInternetowaActivity extends Activity implements
 
 	/* Cykanie zdjecia */
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    	super.onActivityResult(requestCode, resultCode, data);
 		if (requestCode == CAMERA_REQUEST) {
 			if (resultCode == RESULT_OK) {
-				/* sprawdzenie czy zdjecie jest cykane */
-				if (data.hasExtra("data")) {
-					/*
-					 * if the data has an extra called "data" we assume the
-					 * returned data is from the usual camera app
-					 */
-
-					// retrieve the bitmap from the intent
-					Bitmap thumbnail = (Bitmap) data.getExtras().get("data");
-
-					// update the image view with the bitmap
-					iv.setImageBitmap(thumbnail);
-					/* wyswietlanie starego zdjecia */
-				} else if (data.getExtras() == null) {
-					/*
-					 * if there are no extras we assume its the miui camera
-					 * (which returns the path to the image in the returned
-					 * data)
-					 */
-					Toast.makeText(getApplicationContext(),
-							"No extras to retrieve!", Toast.LENGTH_SHORT)
-							.show();
-					// retrieve the path from the intent using
-					// data.getData().getPath() and create a BitmapDrawable
-					// using this path
-					BitmapDrawable thumbnail = new BitmapDrawable(
-							getResources(), data.getData().getPath());
-					// update the image view with the newly created drawable
-					iv.setImageDrawable(thumbnail);
-				}
+		    	Bitmap bm = (Bitmap) data.getExtras().get("data");
+		    	iv.setImageBitmap(bm);
 			} else if (resultCode == RESULT_CANCELED) {
 				Toast.makeText(getApplicationContext(), "Cancelled",
 						Toast.LENGTH_SHORT).show();
