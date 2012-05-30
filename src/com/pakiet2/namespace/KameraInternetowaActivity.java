@@ -35,7 +35,7 @@ import android.widget.Toast;
 import android.widget.TextView;
 
 public class KameraInternetowaActivity extends Activity implements
-		OnClickListener, SurfaceHolder.Callback {
+		OnClickListener, SurfaceHolder.Callback, Runnable {
 	private Timer timer = new Timer();
 	private boolean clicked = false;
 	private MyServer Serwer;
@@ -44,17 +44,18 @@ public class KameraInternetowaActivity extends Activity implements
 	private ImageView iv;
 	Context mycontext;
 
-    //a variable to store a reference to the Surface View at the main.xml file 
-    private SurfaceView sv; 
- 
-    //a bitmap to display the captured image 
-    private Bitmap bmp; 
- 
-    //Camera variables 
-    //a surface holder 
-    private SurfaceHolder sHolder; 
-    //the camera parameters 
-    private Parameters parameters;  
+	Thread t;
+	// a variable to store a reference to the Surface View at the main.xml file
+	private SurfaceView sv;
+
+	// a bitmap to display the captured image
+	private Bitmap bmp;
+
+	// Camera variables
+	// a surface holder
+	private SurfaceHolder sHolder;
+	// the camera parameters
+	private Parameters parameters;
 
 	// Thread t = null;
 	@Override
@@ -78,19 +79,21 @@ public class KameraInternetowaActivity extends Activity implements
 		} else {
 			wifi_info.setText("Your WI-FI is OFF");
 		}
-		
-		//get the Surface View at the main.xml file 
-        sv = (SurfaceView) findViewById(R.id.surfaceView1); 
- 
-        //Get a surface 
-        sHolder = sv.getHolder(); 
- 
-        //add the callback interface methods defined below as the Surface View callbacks 
-        sHolder.addCallback(this); 
- 
-        //tells Android that this surface will have its data constantly replaced 
-        sHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS); 
-    
+
+		// get the Surface View at the main.xml file
+		sv = (SurfaceView) findViewById(R.id.surfaceView1);
+
+		// Get a surface
+		sHolder = sv.getHolder();
+
+		// add the callback interface methods defined below as the Surface View
+		// callbacks
+		sHolder.addCallback(this);
+		// tells Android that this surface will have its data constantly
+		// replaced
+		sHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
+
+		t = new Thread();
 
 		Button bt = (Button) findViewById(R.id.button1);
 		bt.setText("START");
@@ -141,10 +144,11 @@ public class KameraInternetowaActivity extends Activity implements
 			}
 		}
 		if (v.getId() == R.id.button2) {
+
 			// Intent cameraIntent = new Intent(
 			// android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
 			// startActivityForResult(cameraIntent, CAMERA_REQUEST);
-			
+
 		}
 	}
 
@@ -166,54 +170,67 @@ public class KameraInternetowaActivity extends Activity implements
 	@Override
 	public void surfaceChanged(SurfaceHolder holder, int format, int width,
 			int height) {
-		  //get camera parameters 
-        parameters = mCamera.getParameters(); 
+		// get camera parameters
+		parameters = mCamera.getParameters();
 
-        //set camera parameters 
-        mCamera.setParameters(parameters); 
-        mCamera.startPreview(); 
+		// set camera parameters
+		mCamera.setParameters(parameters);
+		mCamera.startPreview();
 
-        //sets what code should be executed after the picture is taken 
-        Camera.PictureCallback mCall = new Camera.PictureCallback() 
-        { 
-            @Override 
-            public void onPictureTaken(byte[] data, Camera camera) 
-            { 
-                //decode the data obtained by the camera into a Bitmap 
-                bmp = BitmapFactory.decodeByteArray(data, 0, data.length); 
-                //set the iv_image 
-                iv.setImageBitmap(bmp); 
-            } 
-        }; 
+		t.start();
 
-        mCamera.takePicture(null, null, mCall);  
-		
 	}
 
 	@Override
 	public void surfaceCreated(SurfaceHolder holder) {
-		// The Surface has been created, acquire the camera and tell it where 
-        // to draw the preview. 
-        mCamera = Camera.open(); 
-        try { 
-           mCamera.setPreviewDisplay(holder); 
- 
-        } catch (IOException exception) { 
-            mCamera.release(); 
-            mCamera = null; 
-        }  
-		
+		// The Surface has been created, acquire the camera and tell it where
+		// to draw the preview.
+		mCamera = Camera.open();
+		try {
+			mCamera.setPreviewDisplay(holder);
+
+		} catch (IOException exception) {
+			mCamera.release();
+			mCamera = null;
+		}
+
 	}
 
 	@Override
 	public void surfaceDestroyed(SurfaceHolder holder) {
-		//stop the preview 
-        mCamera.stopPreview(); 
-        //release the camera 
-        mCamera.release(); 
-        //unbind the camera from this object 
-        mCamera = null;  
-		
+		// stop the preview
+		mCamera.stopPreview();
+		// release the camera
+		mCamera.release();
+		// unbind the camera from this object
+		mCamera = null;
+
+	}
+
+	@Override
+	public void run() {
+		// TODO Auto-generated method stub
+
+
+		for (int i = 0; i < 10; i++) {
+			try {
+				// sets what code should be executed after the picture is taken
+				Camera.PictureCallback mCall = new Camera.PictureCallback() {
+					@Override
+					public void onPictureTaken(byte[] data, Camera camera) {
+						// decode the data obtained by the camera into a Bitmap
+						bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
+						// set the iv_image
+						iv.setImageBitmap(bmp);
+					}
+				};
+				mCamera.takePicture(null, null, mCall);
+				Thread.sleep(2000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 	}
 
 }
