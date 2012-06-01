@@ -20,7 +20,7 @@ html, body {
     padding: 10px 0 0 10px;
 }
 #video{
-	border:solid 8px #4f4f4f;
+	border:solid 15px #4f4f4f;
 	width:400px;
 	height:300px;
 	background-color:green;
@@ -30,8 +30,9 @@ html, body {
 	text-align:center;
 }
 
-#video img{
+#obrazek{
 	margin:0px auto;
+	width:400px;
 }
 
 #copyright{

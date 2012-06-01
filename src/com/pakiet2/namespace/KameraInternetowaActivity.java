@@ -1,6 +1,5 @@
 package com.pakiet2.namespace;
 
-import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -9,33 +8,25 @@ import java.util.Timer;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.PixelFormat;
 import android.hardware.Camera;
 import android.hardware.Camera.Parameters;
-import android.hardware.Camera.PictureCallback;
 import android.net.ConnectivityManager;
 import android.os.Bundle;
-import android.provider.MediaStore.Images;
 import android.util.Log;
-import android.view.LayoutInflater;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
-import android.view.SurfaceHolder.Callback;
 import android.view.View.OnClickListener;
-import android.view.ViewGroup.LayoutParams;
 import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.Toast;
-//import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class KameraInternetowaActivity extends Activity implements
-		OnClickListener, SurfaceHolder.Callback, Runnable {
+		OnClickListener, SurfaceHolder.Callback {
 	private Timer timer = new Timer();
 	private boolean clicked = false;
 	private MyServer Serwer;
@@ -44,7 +35,7 @@ public class KameraInternetowaActivity extends Activity implements
 	private ImageView iv;
 	Context mycontext;
 
-	Thread t;
+	//Thread t;
 	// a variable to store a reference to the Surface View at the main.xml file
 	private SurfaceView sv;
 
@@ -79,7 +70,7 @@ public class KameraInternetowaActivity extends Activity implements
 		} else {
 			wifi_info.setText("Your WI-FI is OFF");
 		}
-
+		//t = new Thread(this);
 		// get the Surface View at the main.xml file
 		sv = (SurfaceView) findViewById(R.id.surfaceView1);
 
@@ -93,7 +84,7 @@ public class KameraInternetowaActivity extends Activity implements
 		// replaced
 		sHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS);
 
-		t = new Thread();
+		
 
 		Button bt = (Button) findViewById(R.id.button1);
 		bt.setText("START");
@@ -172,12 +163,26 @@ public class KameraInternetowaActivity extends Activity implements
 			int height) {
 		// get camera parameters
 		parameters = mCamera.getParameters();
-
+		//parameters.setPictureSize(200, 200);
 		// set camera parameters
 		mCamera.setParameters(parameters);
 		mCamera.startPreview();
-
-		t.start();
+		Camera.PictureCallback mCall = new Camera.PictureCallback() {
+			@Override
+			public void onPictureTaken(byte[] data, Camera camera) {
+				// decode the data obtained by the camera into a Bitmap
+				InputStream is = new ByteArrayInputStream(data);
+				Log.e("KONDZIO",Integer.toString( data.length));
+				Utils.openFileFromTmp(is);
+				bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
+				// set the iv_image
+				
+				iv.setImageBitmap(bmp);
+			}
+		};
+		
+		mCamera.takePicture(null, null, mCall);
+		//t.start();
 
 	}
 
@@ -207,30 +212,36 @@ public class KameraInternetowaActivity extends Activity implements
 
 	}
 
+	/*
 	@Override
 	public void run() {
 		// TODO Auto-generated method stub
-
-
 		for (int i = 0; i < 10; i++) {
+			// sets what code should be executed after the picture is taken
+			Camera.PictureCallback mCall = new Camera.PictureCallback() {
+				@Override
+				public void onPictureTaken(byte[] data, Camera camera) {
+					// decode the data obtained by the camera into a Bitmap
+					bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
+					// set the iv_image
+					iv.setImageBitmap(bmp);
+				}
+			};
+			mCamera.takePicture(null, null, mCall);
+			
 			try {
-				// sets what code should be executed after the picture is taken
-				Camera.PictureCallback mCall = new Camera.PictureCallback() {
-					@Override
-					public void onPictureTaken(byte[] data, Camera camera) {
-						// decode the data obtained by the camera into a Bitmap
-						bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
-						// set the iv_image
-						iv.setImageBitmap(bmp);
-					}
-				};
-				mCamera.takePicture(null, null, mCall);
-				Thread.sleep(2000);
+				Thread.sleep(3000);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
-	}
+		try {
+			t.join();
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}*/
 
 }

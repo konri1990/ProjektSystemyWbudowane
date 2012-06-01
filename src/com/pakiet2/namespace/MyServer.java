@@ -10,6 +10,7 @@ import java.net.NetworkInterface;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketException;
+import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.StringTokenizer;
 
@@ -29,6 +30,9 @@ public class MyServer implements Runnable {
 	final static Handler mHandler = new Handler();
 	boolean isRunning = false;
 	private String host;
+	private static int licznikObrow = 0;
+	InputStream contentTemp = null;
+	InputStream content2 = null;
 
 	/**
 	 * Kontruktor klasy, ustawienie obiektu klasy Context na bierzacy
@@ -61,14 +65,14 @@ public class MyServer implements Runnable {
 						clientsocket.getInputStream(), "ISO-8859-2"));
 				output = clientsocket.getOutputStream();
 
-				mHandler.post(new Runnable() {
-					@Override
-					public void run() {
-						Messages.hint(mycontext, "new client connected FROM "
-								+ clientsocket.getInetAddress() + " "
-								+ clientsocket.getPort());
-					}
-				});
+				// mHandler.post(new Runnable() {
+				// @Override
+				// public void run() {
+				// Messages.hint(mycontext, "new client connected FROM "
+				// + clientsocket.getInetAddress() + " "
+				// + clientsocket.getPort());
+				// }
+				// });
 
 				String sAll = getStringFromInput(input);
 				final String header = sAll.split("\n")[0];
@@ -84,59 +88,92 @@ public class MyServer implements Runnable {
 
 					InputStream content = Utils.openFileFromAssets(localfile,
 							mycontext);
-					if (content != null) {
-						send(content, Utils.getContentType(localfile));
-					}
+
+					// InputStream content2 = Utils.data;
+					// send(content2, "image/bmp");
+					// if (content2 != null) {
+					send(content, Utils.getContentType(localfile));
+					// send(content2, "image/bmp");
+					// }
 				}
 
-				send("<head>" + "<link rel=\"stylesheet\" type=\"text/css\" "
-						+ "href=\""
-						+ this.getHost()
-						+ "/css.css\" />"
-						+ "<script  type=\"text/javascript\">"
-						+ "var t; "
-						+ "var timer_is_on=0;"
-						+ "var c=0;"
-						+ "function timedCount()"
-						+ "{"
-						+ "if(c%2==0){      "
-						+ "    document.getElementById('obrazek').src=\""
-						+ this.getHost()
-						+ "/klatka1.jpg\";"
-						+ " }else{                "
-						+ "       document.getElementById('obrazek').src=\""
-						+ this.getHost()
-						+ "/klatka2.jpg\";"
-						+ "   }"
-						+ "c=c+1;"
-						+ "  t=setTimeout(\"timedCount()\",100);"
-						+ "}"
-						+ "function doTimer()"
-						+ "{"
-						+ "    if (!timer_is_on)"
-						+ "    {"
-						+ "       timer_is_on=1;"
-						+ "        timedCount();"
-						+ "    }"
-						+ "}"
-						+ "function stopCount()"
-						+ "{"
-						+ "    clearTimeout(t);"
-						+ "    timer_is_on=0;"
-						+ "}"
-						+ "</script>"
-						+ "<meta http-equiv=\"Content-type\" value=\"text/html; charset=ISO-8859-2\"></head>"
-						+ "<body onLoad=\"doTimer()\">"
-						+ "<div id=\"page\">"
-						+ "<div id=\"title\"> CAMERA IP v1.2</div>"
-						+ "<div id=\"video\"> <img id='obrazek'  src='"
-						+ getHost()
-						+ "/klatka1.jpg'/ /></div> "
-						+ "<div id=\"copyright\">© Konrad Zapa³a, Tomasz Ziêbiec </div>"
-						+ "</div></body>");
+				if (header.equals("GET /obraz/klatka1.jpg HTTP/1.1")) {
 
+					//if (licznikObrow < 1) {
+
+						if (Utils.data != null) {
+							content2 = Utils.data;
+							//contentTemp = Utils.data;
+							Log.e("TOMASZ", "WYS£ANE BEZ POROWNANIA ");
+							send(content2, "image/jpg");
+						} else {
+							Log.e("KONDZIO", "PUSTE");
+						}
+					/*	licznikObrow++;
+					//} else {
+						// content2 = Utils.data;
+					//	if (isSame(contentTemp, content2)) {
+							send(content2, "image/jpg");
+							Log.e("TOMASZ", "POROWANIE " + licznikObrow
+									+ "  PRAWID£OWE");
+						} else {
+							Log.e("TOMASZ", "POROWANIE " + licznikObrow
+									+ " NIE OK");
+							send(contentTemp, "image/jpg");
+						}
+						licznikObrow++;*/
+					//}
+				} else {
+
+					send("<head>"
+							+ "<link rel=\"stylesheet\" type=\"text/css\" "
+							+ "href=\""
+							+ this.getHost()
+							+ "/css.css\" />"
+							+ "<script  type=\"text/javascript\">"
+							+ "var t; "
+							+ "var timer_is_on=0;"
+							+ "var c=0;"
+							+ "function timedCount()"
+							+ "{"
+							+ "if(c%2==0){      "
+							+ "    document.getElementById('obrazek').src=\""
+							+ this.getHost()
+							+ ":8080/obraz/klatka1.jpg\";"
+							+ " }else{                "
+							+ "       document.getElementById('obrazek').src=\""
+							+ this.getHost()
+							+ ":8080/obraz/klatka1.jpg\";"
+							+ "   }"
+							+ "c=c+1;"
+							+ "  t=setTimeout(\"timedCount()\",100);"
+							+ "}"
+							+ "function doTimer()"
+							+ "{"
+							+ "    if (!timer_is_on)"
+							+ "    {"
+							+ "       timer_is_on=1;"
+							+ "        timedCount();"
+							+ "    }"
+							+ "}"
+							+ "function stopCount()"
+							+ "{"
+							+ "    clearTimeout(t);"
+							+ "    timer_is_on=0;"
+							+ "}"
+							+ "</script>"
+							+ "<meta http-equiv=\"Content-type\" value=\"text/html; charset=ISO-8859-2\"></head>"
+							+ "<body  >"
+							+ "<div id=\"page\">"
+							+ "<div id=\"title\"> CAMERA IP v1.2</div>"
+							+ "<div id=\"video\"> <img id='obrazek'  src='http://"
+							+ getHost()
+							+ ":8080/obraz/klatka1.jpg'/ /></div> "
+							+ "<div id=\"copyright\">© Konrad Zapa³a, Tomasz Ziêbiec </div>"
+							+ "</div></body>");
+
+				}
 				closeInputOutput();
-
 			}
 		} catch (Exception ex) {
 			Log.e("doInBackground Exception", " " + ex);
@@ -180,6 +217,7 @@ public class MyServer implements Runnable {
 			output.write(header.getBytes());
 
 			byte[] buffer = new byte[1024];
+			//byte[] buffer = new byte[400000];
 			int bytes = 0;
 
 			while ((bytes = fis.read(buffer)) != -1) {
@@ -217,7 +255,9 @@ public class MyServer implements Runnable {
 
 	/**
 	 * Metoda odbiera tekst z otwartego polaczenia z klientem
-	 * @param input BufferedReader 
+	 * 
+	 * @param input
+	 *            BufferedReader
 	 * @return Odczytany tekst od klienta
 	 */
 	String getStringFromInput(BufferedReader input) {
@@ -270,4 +310,48 @@ public class MyServer implements Runnable {
 		return host;
 	}
 
+	public static boolean isSame(InputStream input1, InputStream input2)
+			throws IOException {
+		boolean error = false;
+		try {
+			byte[] buffer1 = new byte[1024];
+			byte[] buffer2 = new byte[1024];
+			try {
+				int numRead1 = 0;
+				int numRead2 = 0;
+				while (true) {
+					numRead1 = input1.read(buffer1);
+					numRead2 = input2.read(buffer2);
+					if (numRead1 > -1) {
+						if (numRead2 != numRead1)
+							return false;
+						// Otherwise same number of bytes read
+						if (!Arrays.equals(buffer1, buffer2))
+							return false;
+						// Otherwise same bytes read, so continue ...
+					} else {
+						// Nothing more in stream 1 ...
+						return numRead2 < 0;
+					}
+				}
+			} finally {
+				input1.close();
+			}
+		} catch (IOException e) {
+			error = true; // this error should be thrown, even if there is an
+							// error closing stream 2
+			throw e;
+		} catch (RuntimeException e) {
+			error = true; // this error should be thrown, even if there is an
+							// error closing stream 2
+			throw e;
+		} finally {
+			try {
+				input2.close();
+			} catch (IOException e) {
+				if (!error)
+					throw e;
+			}
+		}
+	}
 }

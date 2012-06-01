@@ -3,8 +3,11 @@ package com.pakiet2.namespace;
 import java.io.InputStream;
 
 import android.content.Context;
+import android.util.Log;
 
 public class Utils {
+	
+	public static InputStream data;
 	/**
 	 * Metoda pozwala przygotowac obrazki do wyslania (zlokalizownaie obrazka)
 	 * 
@@ -17,9 +20,24 @@ public class Utils {
 	public static InputStream openFileFromAssets(String spath, Context mycontext) {
 		try {
 			InputStream is = mycontext.getResources().getAssets().open(spath);
+			//Log.e("TOMASZ:", spath);
 			return is;
 		} catch (Exception ex) {
 			return null;
+		}
+	}
+
+	
+	public static void openFileFromTmp(InputStream loadIs) {
+		try {
+			
+			data = loadIs;
+			//Log.e("KONDZIO", "Ala ");
+			//Log.e("KONDZIO", "Ala " + data.toString());
+			//return data;
+		} catch (Exception ex) {
+			Log.e("UTILS", "Problem z wczytaniem");
+			data = null;
 		}
 	}
 
