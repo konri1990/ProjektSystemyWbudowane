@@ -30,7 +30,7 @@ public class MyServer implements Runnable {
 	final static Handler mHandler = new Handler();
 	boolean isRunning = false;
 	private String host;
-	private static int licznikObrow = 0;
+	//private static int licznikObrow = 0;
 	InputStream contentTemp = null;
 	InputStream content2 = null;
 
