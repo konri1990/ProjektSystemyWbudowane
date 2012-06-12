@@ -1,6 +1,7 @@
 package com.pakiet2.namespace;
 
 import java.io.InputStream;
+import java.io.OutputStream;
 
 import android.content.Context;
 import android.util.Log;
@@ -8,6 +9,7 @@ import android.util.Log;
 public class Utils {
 	
 	public static InputStream data;
+	public static OutputStream data2;
 	/**
 	 * Metoda pozwala przygotowac obrazki do wyslania (zlokalizownaie obrazka)
 	 * 

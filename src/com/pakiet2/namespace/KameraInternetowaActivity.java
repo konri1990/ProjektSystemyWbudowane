@@ -3,8 +3,10 @@ package com.pakiet2.namespace;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Timer;
 import android.app.Activity;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
@@ -12,8 +14,10 @@ import android.graphics.BitmapFactory;
 import android.hardware.Camera;
 import android.hardware.Camera.Parameters;
 import android.net.ConnectivityManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
+import android.provider.MediaStore.Images.Media;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -23,6 +27,7 @@ import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class KameraInternetowaActivity extends Activity implements
 		OnClickListener, SurfaceHolder.Callback, Camera.PictureCallback {
@@ -48,7 +53,7 @@ public class KameraInternetowaActivity extends Activity implements
 	Handler timerUpdateHandler;
 	boolean timelapseRunning = false;
 	int currentTime = 0;
-	final int SECONDS_BETWEEN_PHOTOS = 1;
+	final int SECONDS_BETWEEN_PHOTOS = 2;
 
 	// Thread t = null;
 	@Override
@@ -105,7 +110,7 @@ public class KameraInternetowaActivity extends Activity implements
 				currentTime = 0;
 			}
 			//set the time between next photo taken
-			timerUpdateHandler.postDelayed(timerUpdateTask, 50);
+			timerUpdateHandler.postDelayed(timerUpdateTask, 1000);
 		}
 	};
 
@@ -242,14 +247,32 @@ public class KameraInternetowaActivity extends Activity implements
 	@Override
 	public void onPictureTaken(byte[] data, Camera camera) {
 		// TODO Auto-generated method stub
+		/*
 		InputStream is = new ByteArrayInputStream(data);
 		Log.e("KONDZIO", Integer.toString(data.length));
 		Utils.openFileFromTmp(is);
 		bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
 		// set the iv_image
 
-		iv.setImageBitmap(bmp);
+		iv.setImageBitmap(bmp);*/
 		// camera.startPreview();
+	    Uri imageFileUri = getContentResolver().insert(
+		        Media.EXTERNAL_CONTENT_URI, new ContentValues());
+		    try {
+		      OutputStream imageFileOS = getContentResolver().openOutputStream(
+		          imageFileUri);
+		      imageFileOS.write(data);
+		      imageFileOS.flush();
+		      imageFileOS.close();
+		      Utils.data2.write(data);
+
+		      Toast t = Toast.makeText(this, "Saved JPEG!", Toast.LENGTH_SHORT);
+		      t.show();
+		    } catch (Exception e) {
+		      Toast t = Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT);
+		      t.show();
+		    }
+		    camera.startPreview();
 	}
 
 	/*

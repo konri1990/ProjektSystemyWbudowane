@@ -32,7 +32,7 @@ public class MyServer implements Runnable {
 	private String host;
 	//private static int licznikObrow = 0;
 	InputStream contentTemp = null;
-	InputStream content2 = null;
+	OutputStream content2 = null;
 
 	/**
 	 * Kontruktor klasy, ustawienie obiektu klasy Context na bierzacy
@@ -102,7 +102,7 @@ public class MyServer implements Runnable {
 					//if (licznikObrow < 1) {
 
 						if (Utils.data != null) {
-							content2 = Utils.data;
+							content2 = Utils.data2;
 							//contentTemp = Utils.data;
 							Log.e("TOMASZ", "WYS£ANE BEZ POROWNANIA ");
 							send(content2, "image/jpg");
@@ -223,6 +223,28 @@ public class MyServer implements Runnable {
 			while ((bytes = fis.read(buffer)) != -1) {
 				output.write(buffer, 0, bytes);
 			}
+
+		} catch (Exception ex) {
+			Log.e("exxx send", ex + "");
+		}
+	}
+	
+	void send(OutputStream os, String contenttype) {
+		try {
+			String header = "HTTP/1.1 200 OK\n" + "Content-type: "
+					+ contenttype + "\n" + "Content-Length: " //fis.available()
+					+ "\n" + "\n";
+
+			output.write(header.getBytes());
+
+			//byte[] buffer = new byte[1024];
+			//byte[] buffer = new byte[400000];
+			//int bytes = 0;
+
+			//while ((bytes = fis.read(buffer)) != -1) {
+				//output.write(buffer, 0, bytes);
+			//}
+			output = os;
 
 		} catch (Exception ex) {
 			Log.e("exxx send", ex + "");
