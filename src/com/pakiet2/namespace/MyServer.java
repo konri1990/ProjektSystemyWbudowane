@@ -1,10 +1,15 @@
 package com.pakiet2.namespace;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.PipedInputStream;
+import java.io.PipedOutputStream;
+import java.io.PrintStream;
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.ServerSocket;
@@ -89,40 +94,25 @@ public class MyServer implements Runnable {
 					InputStream content = Utils.openFileFromAssets(localfile,
 							mycontext);
 
-					// InputStream content2 = Utils.data;
-					// send(content2, "image/bmp");
-					// if (content2 != null) {
 					send(content, Utils.getContentType(localfile));
-					// send(content2, "image/bmp");
-					// }
+					 
 				}
 
-				if (header.equals("GET /obraz/klatka1.jpg HTTP/1.1")) {
-
-					//if (licznikObrow < 1) {
+				
+				
+				if (header.contains("obraz")) {
+				
+					Log.e("JAINAGLOWEK CONT ",header.toString()  );
+					
 
 						if (Utils.data != null) {
-							content2 = Utils.data2;
-							//contentTemp = Utils.data;
+							contentTemp = Utils.data;
 							Log.e("TOMASZ", "WYS£ANE BEZ POROWNANIA ");
-							send(content2, "image/jpg");
+							send(contentTemp, "image/jpg");
 						} else {
 							Log.e("KONDZIO", "PUSTE");
 						}
-					/*	licznikObrow++;
-					//} else {
-						// content2 = Utils.data;
-					//	if (isSame(contentTemp, content2)) {
-							send(content2, "image/jpg");
-							Log.e("TOMASZ", "POROWANIE " + licznikObrow
-									+ "  PRAWID£OWE");
-						} else {
-							Log.e("TOMASZ", "POROWANIE " + licznikObrow
-									+ " NIE OK");
-							send(contentTemp, "image/jpg");
-						}
-						licznikObrow++;*/
-					//}
+					
 				} else {
 
 					send("<head>"
@@ -130,40 +120,25 @@ public class MyServer implements Runnable {
 							+ "href=\""
 							+ this.getHost()
 							+ "/css.css\" />"
+							+"<script type=\"text/javascript\" src=\""
+							+ this.getHost()
+							+ "/jquery.min.js\"></script>"
 							+ "<script  type=\"text/javascript\">"
-							+ "var t; "
-							+ "var timer_is_on=0;"
-							+ "var c=0;"
-							+ "function timedCount()"
-							+ "{"
-							+ "if(c%2==0){      "
-							+ "    document.getElementById('obrazek').src=\""
-							+ this.getHost()
-							+ ":8080/obraz/klatka1.jpg\";"
-							+ " }else{                "
-							+ "       document.getElementById('obrazek').src=\""
-							+ this.getHost()
-							+ ":8080/obraz/klatka1.jpg\";"
-							+ "   }"
-							+ "c=c+1;"
-							+ "  t=setTimeout(\"timedCount()\",100);"
-							+ "}"
-							+ "function doTimer()"
-							+ "{"
-							+ "    if (!timer_is_on)"
-							+ "    {"
-							+ "       timer_is_on=1;"
-							+ "        timedCount();"
-							+ "    }"
-							+ "}"
-							+ "function stopCount()"
-							+ "{"
-							+ "    clearTimeout(t);"
-							+ "    timer_is_on=0;"
-							+ "}"
+							+ "$(document).ready(function() {"
+							+ "   setInterval(function() {"
+							 + "     var img = $(\"<img />\").attr('src', 'http://192.168.1.6:8080/obraz/klatka1QW' + new Date().getTime() + '.jpg')"
+							 + "                  .load(function() {"
+							 + "                        if (!this.complete || typeof this.naturalWidth == \"undefined\" || this.naturalWidth == 0) {"
+							 + "                            alert('broken image!');"
+							 + "                         } else {"
+							 + "                           $('#video').html(img);"
+							 + "                        }"
+							 + "                     });"
+							 + "}, 300);"
+							 + "});"
 							+ "</script>"
 							+ "<meta http-equiv=\"Content-type\" value=\"text/html; charset=ISO-8859-2\"></head>"
-							+ "<body  >"
+							+ "<body >"
 							+ "<div id=\"page\">"
 							+ "<div id=\"title\"> CAMERA IP v1.2</div>"
 							+ "<div id=\"video\"> <img id='obrazek'  src='http://"
@@ -173,7 +148,7 @@ public class MyServer implements Runnable {
 							+ "</div></body>");
 
 				}
-				closeInputOutput();
+				closeInputOutput(); 
 			}
 		} catch (Exception ex) {
 			Log.e("doInBackground Exception", " " + ex);
@@ -231,20 +206,27 @@ public class MyServer implements Runnable {
 	
 	void send(OutputStream os, String contenttype) {
 		try {
-			String header = "HTTP/1.1 200 OK\n" + "Content-type: "
+	ByteArrayOutputStream buff  = new ByteArrayOutputStream();
+	buff.writeTo(os);
+	InputStream fis = new ByteArrayInputStream(buff.toByteArray());
+
+	Log.e("TOMASZ", "KONTERT");
+	
+	String header = "HTTP/1.1 200 OK\n" + "Content-type: "
 					+ contenttype + "\n" + "Content-Length: " //fis.available()
 					+ "\n" + "\n";
 
+			  
 			output.write(header.getBytes());
 
-			//byte[] buffer = new byte[1024];
+			byte[] buffer = new byte[1024];
 			//byte[] buffer = new byte[400000];
-			//int bytes = 0;
+			int bytes = 0;
 
-			//while ((bytes = fis.read(buffer)) != -1) {
-				//output.write(buffer, 0, bytes);
-			//}
-			output = os;
+			while ((bytes = fis.read(buffer)) != -1) {
+				output.write(buffer, 0, bytes);
+			}
+			//output = os;
 
 		} catch (Exception ex) {
 			Log.e("exxx send", ex + "");
@@ -317,6 +299,8 @@ public class MyServer implements Runnable {
 		try {
 			input.close();
 			output.close();
+			Utils.data.close();
+			contentTemp.close();
 			clientsocket.close();
 		} catch (Exception ex) {
 			Log.e("ex closeInputOutput", ex + "");

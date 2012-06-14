@@ -4,6 +4,7 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.util.List;
 import java.util.Timer;
 import android.app.Activity;
 import android.content.ContentValues;
@@ -11,6 +12,7 @@ import android.content.Context;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.PixelFormat;
 import android.hardware.Camera;
 import android.hardware.Camera.Parameters;
 import android.net.ConnectivityManager;
@@ -27,7 +29,7 @@ import android.view.Window;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
+
 
 public class KameraInternetowaActivity extends Activity implements
 		OnClickListener, SurfaceHolder.Callback, Camera.PictureCallback {
@@ -53,7 +55,6 @@ public class KameraInternetowaActivity extends Activity implements
 	Handler timerUpdateHandler;
 	boolean timelapseRunning = false;
 	int currentTime = 0;
-	final int SECONDS_BETWEEN_PHOTOS = 2;
 
 	// Thread t = null;
 	@Override
@@ -102,15 +103,12 @@ public class KameraInternetowaActivity extends Activity implements
 
 	private Runnable timerUpdateTask = new Runnable() {
 		public void run() {
-			if (currentTime < SECONDS_BETWEEN_PHOTOS) {
-				currentTime++;
-			} else {
+
 				mCamera.takePicture(null, null, null,
 						KameraInternetowaActivity.this);
 				currentTime = 0;
-			}
-			//set the time between next photo taken
-			timerUpdateHandler.postDelayed(timerUpdateTask, 1000);
+
+			timerUpdateHandler.postDelayed(timerUpdateTask, 1000); 
 		}
 	};
 
@@ -156,60 +154,27 @@ public class KameraInternetowaActivity extends Activity implements
 		if (v.getId() == R.id.button2) {
 
 			if (!timelapseRunning) {
-				bt2.setText("TEST APARAT 1");
+				bt2.setText("START APARAT");
 				timelapseRunning = true;
 				timerUpdateHandler.post(timerUpdateTask);
 			} else {
-				bt2.setText("TEST APARAT 2");
+				bt2.setText("STOP APARAT");
 				timelapseRunning = false;
 				timerUpdateHandler.removeCallbacks(timerUpdateTask);
 			}
-			// Intent cameraIntent = new Intent(
-			// android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
-			// startActivityForResult(cameraIntent, CAMERA_REQUEST);
+
 
 		}
 	}
 
-	/* Cykanie zdjecia *//*
-						 * protected void onActivityResult(int requestCode, int
-						 * resultCode, Intent data) {
-						 * super.onActivityResult(requestCode, resultCode,
-						 * data); if (requestCode == CAMERA_REQUEST) { if
-						 * (resultCode == RESULT_OK) { Bitmap bm = (Bitmap)
-						 * data.getExtras().get("data"); iv.setImageBitmap(bm);
-						 * } else if (resultCode == RESULT_CANCELED) {
-						 * Toast.makeText(getApplicationContext(), "Cancelled",
-						 * Toast.LENGTH_SHORT).show(); }
-						 * 
-						 * } }
-						 */
+
 
 	@Override
 	public void surfaceChanged(SurfaceHolder holder, int format, int width,
 			int height) {
-		// get camera parameters
-		// parameters = mCamera.getParameters();
-		// parameters.setPictureSize(200, 200);
-		// set camera parameters
-		// mCamera.setParameters(parameters);
+
 		mCamera.startPreview();
-		/*
-		 * Camera.PictureCallback mCall = new Camera.PictureCallback() {
-		 * 
-		 * @Override public void onPictureTaken(byte[] data, Camera camera) { //
-		 * decode the data obtained by the camera into a Bitmap InputStream is =
-		 * new ByteArrayInputStream(data); Log.e("KONDZIO",
-		 * Integer.toString(data.length)); Utils.openFileFromTmp(is); bmp =
-		 * BitmapFactory.decodeByteArray(data, 0, data.length); // set the
-		 * iv_image
-		 * 
-		 * iv.setImageBitmap(bmp); } };
-		 * 
-		 * mCamera.takePicture(null, null, mCall);
-		 */
-		// t.start();
-		// mCamera.startPreview();
+		
 
 	}
 
@@ -221,6 +186,13 @@ public class KameraInternetowaActivity extends Activity implements
 		try {
 			mCamera.setPreviewDisplay(holder);
 			parameters = mCamera.getParameters();
+
+			parameters.setPictureSize(
+					parameters.getSupportedPictureSizes().get(17).width,
+					parameters.getSupportedPictureSizes().get(17).height);
+			parameters.setJpegQuality(70);
+			parameters.setPictureFormat(PixelFormat.JPEG);
+
 			if (this.getResources().getConfiguration().orientation != Configuration.ORIENTATION_LANDSCAPE) {
 				parameters.set("orientation", "portrait");
 			}
@@ -247,49 +219,25 @@ public class KameraInternetowaActivity extends Activity implements
 	@Override
 	public void onPictureTaken(byte[] data, Camera camera) {
 		// TODO Auto-generated method stub
-		/*
-		InputStream is = new ByteArrayInputStream(data);
-		Log.e("KONDZIO", Integer.toString(data.length));
-		Utils.openFileFromTmp(is);
-		bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
-		// set the iv_image
-
-		iv.setImageBitmap(bmp);*/
-		// camera.startPreview();
+		
 	    Uri imageFileUri = getContentResolver().insert(
 		        Media.EXTERNAL_CONTENT_URI, new ContentValues());
-		    try {
-		      OutputStream imageFileOS = getContentResolver().openOutputStream(
-		          imageFileUri);
-		      imageFileOS.write(data);
-		      imageFileOS.flush();
-		      imageFileOS.close();
-		      Utils.data2.write(data);
 
-		      Toast t = Toast.makeText(this, "Saved JPEG!", Toast.LENGTH_SHORT);
-		      t.show();
+	    camera.startPreview();    
+	    try {
+		        InputStream is = new ByteArrayInputStream(data);
+				Utils.openFileFromTmp(is);
+				//bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
+				// set the iv_image
+
+				//iv.setImageBitmap(bmp);
+				
+				is.close();
+
 		    } catch (Exception e) {
-		      Toast t = Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT);
-		      t.show();
+		      Log.e("KONDZIO", "POSZLO");
 		    }
-		    camera.startPreview();
 	}
 
-	/*
-	 * @Override public void run() { // TODO Auto-generated method stub for (int
-	 * i = 0; i < 10; i++) { // sets what code should be executed after the
-	 * picture is taken Camera.PictureCallback mCall = new
-	 * Camera.PictureCallback() {
-	 * 
-	 * @Override public void onPictureTaken(byte[] data, Camera camera) { //
-	 * decode the data obtained by the camera into a Bitmap bmp =
-	 * BitmapFactory.decodeByteArray(data, 0, data.length); // set the iv_image
-	 * iv.setImageBitmap(bmp); } }; mCamera.takePicture(null, null, mCall);
-	 * 
-	 * try { Thread.sleep(3000); } catch (InterruptedException e) { // TODO
-	 * Auto-generated catch block e.printStackTrace(); } } try { t.join(); }
-	 * catch (InterruptedException e) { // TODO Auto-generated catch block
-	 * e.printStackTrace(); } }
-	 */
 
 }
