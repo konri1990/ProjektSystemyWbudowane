@@ -49,7 +49,7 @@ public class KameraInternetowaActivity extends Activity implements
 	private Button bt2;
 	// Camera variables
 	// a surface holder
-	private SurfaceHolder sHolder;
+	private SurfaceHolder sHolder; 
 	// the camera parameters
 	private Parameters parameters;
 	Handler timerUpdateHandler;
